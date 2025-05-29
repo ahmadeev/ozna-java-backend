@@ -45,15 +45,17 @@ public class RandomNumberWebSocket {
     public void onMessage(String message, Session session) {
         System.out.println("[WS] Received message length (session: " + session.getId() + "): " + message.length());
 
-        RandomNumberRequest randomNumberRequest = JSONParser.parseJSON(message, RandomNumberRequest.class);
-
         // wa: грубо
         if (message.contains("{\"type\":\"ping\"}")) {
             session.getAsyncRemote().sendText("{\"type\":\"pong\"}");
             return;
         }
 
+        RandomNumberRequest randomNumberRequest = JSONParser.parseJSON(message, RandomNumberRequest.class);
         if (randomNumberRequest == null) return;
+
+        if (randomNumberRequest.getFrequency() <= 0) return;
+        if (randomNumberRequest.getMin() > randomNumberRequest.getMax()) return;
 
         if (randomNumberRequest.isRun()) {
             startTask(session, randomNumberRequest);
