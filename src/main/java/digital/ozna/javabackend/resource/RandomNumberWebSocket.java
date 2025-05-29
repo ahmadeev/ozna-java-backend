@@ -16,7 +16,8 @@ import java.util.concurrent.*;
 
 @ServerEndpoint(value = "/ws/random-numbers")
 public class RandomNumberWebSocket {
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    // private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
 
     private static final Map<Session, ScheduledFuture<?>> RUNNING_TASKS = new ConcurrentHashMap<>();
@@ -45,6 +46,13 @@ public class RandomNumberWebSocket {
         System.out.println("[WS] Received message length (session: " + session.getId() + "): " + message.length());
 
         RandomNumberRequest randomNumberRequest = JSONParser.parseJSON(message, RandomNumberRequest.class);
+
+        // wa: грубо
+        if (message.contains("{\"type\":\"ping\"}")) {
+            session.getAsyncRemote().sendText("{\"type\":\"pong\"}");
+            return;
+        }
+
         if (randomNumberRequest == null) return;
 
         if (randomNumberRequest.isRun()) {
