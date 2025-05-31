@@ -7,6 +7,7 @@ import digital.ozna.javabackend.utils.RandomNumberGenerator;
 import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
@@ -17,7 +18,7 @@ import java.util.concurrent.*;
 @ServerEndpoint(value = "/ws/random-numbers")
 public class RandomNumberWebSocket {
     // private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
+    // private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
     private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
 
     private static final Map<Session, ScheduledFuture<?>> RUNNING_TASKS = new ConcurrentHashMap<>();
@@ -74,7 +75,8 @@ public class RandomNumberWebSocket {
                 RandomNumberResponse response = new RandomNumberResponse(
                         request.getId(),
                         RandomNumberGenerator.generateNumber(random, request.getMax(), request.getMin()),
-                        LocalDateTime.now().format(formatter)
+                        // LocalDateTime.now().format(formatter) // несогласованные даты были, ночь убил
+                        Instant.now().toString()
                 );
                 session.getAsyncRemote().sendText(response.toJsonString());
             } catch (Exception e) {
