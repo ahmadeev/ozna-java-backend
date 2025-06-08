@@ -76,7 +76,7 @@ public class RandomNumberWebSocket {
                         request.getId(),
                         RandomNumberGenerator.generateNumber(random, request.getMax(), request.getMin()),
                         // LocalDateTime.now().format(formatter) // несогласованные даты были, ночь убил
-                        Instant.now().toString()
+                        Instant.now().toString() // UTC-строка
                 );
                 session.getAsyncRemote().sendText(response.toJsonString());
             } catch (Exception e) {
